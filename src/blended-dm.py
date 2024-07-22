@@ -114,7 +114,7 @@ def main():
 
 
     body_thickness = 2
-    body_subsurf_level = 1
+    body_subsurf_level = 2
     relaxed_mesh = True
     switch_support = True
     loligagger_port = True
@@ -128,7 +128,7 @@ def main():
     bottom_thickness = 3              # Thickness of Bottom Plate
 
     # Options include 'none' 'amoeba' 'royale' and 'king'
-    amoeba_style = 'king'
+    amoeba_style = 'click'
 
     if amoeba_style == 'none':
         amoeba_size = [0, 0, 0]
@@ -146,6 +146,10 @@ def main():
         amoeba_size = [19.4, 19.4, 1.75]
         amoeba_position = [0, 0, -2.25]
         amoeba_inner_mod = [2, 2, 0]
+    elif amoeba_style == 'click':
+        amoeba_size = [16, 16, 2]
+        amoeba_position = [0, 0, -1.5]
+        amoeba_inner_mod = [0, 0, 0]
 
 
 
@@ -183,18 +187,21 @@ def main():
 
     keyswitch_height = 14.4
     keyswitch_width = 14.4
-    mount_thickness = 4
+    mount_thickness = 1.5
 
     mount_height = keyswitch_height + 3
     mount_width = keyswitch_width + 3
+    
+    kc_proj_in = 19
+    kc_proj_out = 19
 
 
 
     for size in [1, 1.5]:
         for shape in [['switch_projection', (0, 0, 2*mount_thickness-1), (mount_width, mount_height*size,  4*mount_thickness)],
                       ['switch_projection_inner', tuple(map(operator.add, (0, 0, 6*mount_thickness), amoeba_position)) , tuple(map(operator.add, (mount_width+1.8, mount_height*size+1.8, 12*mount_thickness), amoeba_inner_mod))],
-                      ['keycap_projection_outer', (0, 0, mount_thickness + 4 + 2), (19, 19*size, 8)],
-                      ['keycap_projection_inner', (0, 0, mount_thickness + 4 + 2 - 2), (19+2, 19*size+2, 8)],
+                      ['keycap_projection_outer', (0, 0, mount_thickness + 4 + 2), (kc_proj_out, kc_proj_out*size, 8)],
+                      ['keycap_projection_inner', (0, 0, mount_thickness + 4 + 2 - 2), (kc_proj_in+2, kc_proj_in*size+2, 8)],
                       ['switch_hole', (0, 0, 0), (keyswitch_width, keyswitch_height, 3*mount_thickness)],
                       ['ameoba_cut', amoeba_position, tuple(map(operator.mul, amoeba_size, (1, 1, 2)))],
                       ['nub_cube', ((1.5 / 2) + 0.5*(keyswitch_width-0.01), 0, 0.5*mount_thickness), (1.5, 2.75, mount_thickness - 0.01)]]:
@@ -215,7 +222,7 @@ def main():
                 bpy.data.objects[shape[0] + "_" + str(size) + "u"].vertex_groups['Group'].name = 'bottom_project'
             
             elif shape[0] in ['nub_cube']:
-                bpy.ops.mesh.primitive_cylinder_add(vertices=50, radius=1.0 - 0.005, depth=2.75, location=(keyswitch_width / 2, 0, 1), rotation=(pi / 2, 0, 0))
+                bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=1.0 - 0.005, depth=2.75, location=(keyswitch_width / 2, 0, 1), rotation=(pi / 2, 0, 0))
                 bpy.context.selected_objects[0].name = "switch_support_" + str(size) + "u"
                 bpy.data.objects[shape[0] + "_" + str(size) + "u"].select_set(True)
                 bpy.ops.object.join()
@@ -230,8 +237,8 @@ def main():
 
         bpy.ops.object.select_all(action='DESELECT')
 
-
-
+    
+    
     ##########################
     ## FINGER KEY LOCATIONS ##
     ##########################
@@ -2783,22 +2790,22 @@ def main():
     ## Add Switch Supports ##
     #########################
 
-    if switch_support:
-        print("{:.2f}".format(time.time()-start_time), "- Add Switch Supports")
-        
-        bpy.ops.object.select_all(action='DESELECT')
-        bpy.context.view_layer.objects.active = bpy.data.objects["body"]
-        bpy.data.objects['body'].select_set(True)
-        
-        bpy.ops.object.modifier_add(type='BOOLEAN')
-        bpy.context.object.modifiers["Boolean"].operation = 'UNION'
-        bpy.context.object.modifiers["Boolean"].operand_type = 'COLLECTION'
-        bpy.context.object.modifiers["Boolean"].solver = 'FAST'
-        bpy.context.object.modifiers["Boolean"].double_threshold = 0.00001
-        bpy.context.object.modifiers["Boolean"].collection = bpy.data.collections["SWITCH_SUPPORT"]
-        bpy.ops.object.modifier_apply(modifier="Boolean")
-
-        bpy.ops.mesh.print3d_clean_non_manifold()
+    #if switch_support:
+    #    print("{:.2f}".format(time.time()-start_time), "- Add Switch Supports")
+    #    
+    #    bpy.ops.object.select_all(action='DESELECT')
+    #    bpy.context.view_layer.objects.active = bpy.data.objects["body"]
+    #    bpy.data.objects['body'].select_set(True)
+    #    
+    #    bpy.ops.object.modifier_add(type='BOOLEAN')
+    #    bpy.context.object.modifiers["Boolean"].operation = 'UNION'
+    #    bpy.context.object.modifiers["Boolean"].operand_type = 'COLLECTION'
+    #    bpy.context.object.modifiers["Boolean"].solver = 'FAST'
+    #    bpy.context.object.modifiers["Boolean"].double_threshold = 0.00001
+    #    bpy.context.object.modifiers["Boolean"].collection = bpy.data.collections["SWITCH_SUPPORT"]
+    #    bpy.ops.object.modifier_apply(modifier="Boolean")
+    #
+    #    bpy.ops.mesh.print3d_clean_non_manifold()
 
 
 
